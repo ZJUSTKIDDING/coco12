@@ -1,0 +1,146 @@
+@import "app/styles/style-flat-variables"
+
+#minigame-content
+
+  min-height: 100vh
+
+  .left-column
+    width: 900px
+
+  .right-column
+    position: absolute
+    left: 900px
+    top: 0px
+    width: 400px
+    padding: 10px
+    margin-top: 60px
+    text-align: left
+
+
+  div.intro
+
+    h2
+      font-weight: bold
+
+    .help
+      background-color: red
+      color: white
+      padding: 2px 10px
+      border-radius: 10px
+      position: absolute
+
+    #intro-if
+      top: 172px
+      right: 120px
+    #intro-else
+      top: 410px
+      right: 120px
+    #intro-conditional
+      top: 96px
+      left: 120px
+    #intro-properties
+      top: 420px
+      left: 5px
+
+  div.game-progress
+    padding-left: 100px
+    padding-bottom: 10px
+    div
+      margin-left: 20px
+      text-align: center
+      display: inline-block
+      width: 40px
+      height: 40px
+    img
+      height: 40px
+      width: 40px
+
+  @keyframes wigglyWobblyAnim
+    10%, 90%
+      transform: translate3d(-1px, 0, 0)
+    20%, 80%
+      transform: translate3d(2px, 0, 0)
+    30%, 50%, 70%
+      transform: translate3d(-4px, 0, 0)
+    40%, 60%
+      transform: translate3d(4px, 0, 0)
+
+  div.path.exploded
+    animation: wigglyWobblyAnim 1s cubic-bezier(.36,.07,.19,.97) infinite both
+    transform: translate3d(0, 0, 0)
+    backface-visibility: hidden
+    // perspective: 1000px
+
+  div.path
+    position: relative
+    background-color: #aaffaa
+    height: 600px
+    width: 900px
+    background-image: url("/images/pages/minigames/conditionals/forked-path.jpg")
+    background-size: 110% 100%
+    background-position: top 2px left -91px
+
+    .trap
+      position: absolute
+      top: 280px
+      left: 280px
+
+    .pet
+      position: absolute
+      img
+        width: 100px
+        max-height: 120px
+
+    .if-conditional
+      font-size: 150%
+      position: absolute
+      left: 350px
+      top: 95px
+
+    .else-conditional
+      font-size: 150%
+      position: absolute
+      left: 350px
+      top: 322px
+
+
+    .choice
+      position: absolute
+      right: 10px
+
+      button
+        width: 100px
+        height: 100px
+        font-size: 40px
+        box-shadow: 10px 10px 10px 0px rgba(0,0,0,0.75)
+        border: 2px solid black
+        // border-radius: 10px
+
+      &.if-path
+        top: 106px
+      &.else-path
+        top: 345px
+
+      img.answer-image
+        height: 100px
+
+    div.properties
+      position: absolute
+      bottom: 10px
+      left: 10px
+
+      ul
+        background-color: white
+        border-radius: 2px
+        padding-left: 10px
+      li
+        list-style-type: none
+
+  .score
+    width: 900px
+    text-align: center
+
+    button
+      margin-left: 10px
+
+
