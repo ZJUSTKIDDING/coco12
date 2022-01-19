@@ -1,0 +1,185 @@
+<script>
+  import Modal from 'app/components/common/Modal'
+
+  export default Vue.extend({
+    components: {
+      Modal
+    },
+    props: {
+      firstName: {
+        type: String
+      },
+      lastName: {
+        type: String
+      },
+      name: {
+        type: String
+      },
+      email: {
+        type: String
+      },
+      // YYYY-MM
+      birthday: {
+        type: String
+      },
+      emails: {
+        type: Object,
+        default: { generalNews: { enabled: false } }
+      },
+      unsubscribedFromMarketingEmails: {
+        type: Boolean,
+        default: true
+      }
+    },
+    mounted () {
+      this.formValues = this.userToFormValues(this) // Extract props
+    },
+    data: () => ({
+      formValues: {
+        emails: { generalNews: { enabled: false } },
+        unsubscribedFromMarketingEmails: true,
+
+        // Split apart to handle month and year in a simple way
+        selectedMonth: 1,
+        selectedYear: 2020
+      }
+    }),
+    methods: {
+      userToFormValues (userValues) {
+        const extracted = _.pick(userValues, ['firstName', 'lastName', 'name', 'email', 'birthday', 'emails', 'unsubscribedFromMarketingEmails'])
+
+        if (!extracted.emails) {
+          extracted.emails = { generalNews: { enabled: false } }
+        } else if (!extracted.emails.generalNews) {
+          extracted.emails.generalNews = { enabled: false }
+        }
+
+        // The only way birthday has been set is to a YYYY-MM string with @signupState.get('birthday').toISOString().slice(0,7)
+        if (typeof extracted.birthday === 'string' && extracted.birthday.length === 7) {
+          extracted.selectedMonth = parseInt(extracted.birthday.slice(-2))
+          extracted.selectedYear = parseInt(extracted.birthday.slice(0, 4))
+        } else {
+          extracted.birthday = '2020-01'
+          extracted.selectedMonth = 1
+          extracted.selectedYear = 2020
+        }
+
+        return extracted
+      },
+      formToUserValues (formValues) {
+        const extracted = _.pick(formValues, ['firstName', 'lastName', 'name', 'email', 'emails', 'unsubscribedFromMarketingEmails', 'selectedMonth', 'selectedYear'])
+
+        const zeroedMonth = extracted.selectedMonth < 10 ? `0${extracted.selectedMonth}` : extracted.selectedMonth
+        extracted.birthday = `${extracted.selectedYear}-${zeroedMonth}`
+        delete extracted.selectedMonth
+        delete extracted.selectedYear
+
+        return extracted
+      },
+      submit () {
+        if (!this.canSubmit) {
+          // How did we even get here?
+          noty({ type: 'error', text: 'Must receive emails to sign up' })
+          return
+        }
+
+        this.$emit('submit', this.formToUserValues(this.formValues))
+        this.$emit('close')
+      }
+    },
+    computed: {
+      canSubmit () {
+        return this.formValues.emails.generalNews.enabled &&
+            !this.formValues.unsubscribedFromMarketingEmails
+      }
+    }
+  })
+</script>
+
+<template>
+  <modal @close="$emit('close')" title="Register" id="league-signup-modal">
+    <div v-if="me.isStudent()">
+      <p>{{ $t('league.student_register_1') }}</p>
+      <p>{{ $t('league.student_register_2') }}</p>
+      <p>{{ $t('league.student_register_3') }}</p>
+    </div>
+    <div v-else-if="me.isTeacher()">
+      <p>{{ $t('league.teacher_register_1') }}</p>
+    </div>
+    <div>
+      <!--  How did we get here?  -->
+      Something went wrong - go back to the <a href="/league">league</a> page.
+    </div>
+
+    Sign up, create your own clan, or join other clans to start competing.
+
+    Provide the information below to be eligible for prizes.
+
+    <div class="container">
+      <div>
+        <label for="input-firstname">First name:</label>
+        <input id="input-firstname" type="text" v-model="formValues.firstName" />
+      </div>
+
+      <div>
+        <label for="input-lastname">Last name:</label>
+        <input id="input-lastname" type="text" v-model="formValues.lastName" />
+      </div>
+
+      <div>
+        <label for="input-username">Username: </label>
+        <input id="input-username" type="text" v-model="formValues.name" />
+      </div>
+
+      <div>
+        <label for="input-email">Email: </label>
+        <input id="input-email" type="email" v-model="formValues.email" />
+      </div>
+
+      <div>
+        <label for="input-emails"></label>
+        <input id="input-emails" type="checkbox" v-model="formValues.emails.generalNews.enabled" />
+      </div>
+      <i>{{ $t('league.general_news') }}</i>
+
+      <div>
+        <label for="input-consent">Unsubscribe from emails:</label>
+        <input id="input-consent" type="checkbox" v-model="formValues.unsubscribedFromMarketingEmails" />
+      </div>
+
+      <div>
+        <label for="input-month">Birth month:</label>
+        <input id="input-month" type="number" min="1" max="12" v-model="formValues.selectedMonth" />
+      </div>
+
+      <div>
+        <label for="input-year">Birth year:</label>
+        <!-- How early does someone really start coding...? :) -->
+        <input id="input-year" type="number" min="1920" :max="new Date().getFullYear() - 1" v-model="formValues.selectedYear" />
+      </div>
+
+      <p style="color: red; font-size: 20px;" v-show="!canSubmit">
+        AI League requires age, receiving emails, and not being unsubscribed from emails
+      </p>
+
+      <button @click.prevent="submit" :disabled="!canSubmit">Register</button>
+    </div>
+  </modal>
+</template>
+
+<style scoped>
+/* 1995 style look... :) */
+#league-signup-modal label {
+  color: black;
+  min-width: 20%;
+  padding-right: 20px;
+  margin-bottom: 10px;
+}
+
+#league-signup-modal .container > div {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+</style>
