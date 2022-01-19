@@ -1,0 +1,48 @@
+div.admin-classroom-levels.container
+  h3 Classroom Levels
+  div(v-if="loading") Loading...
+  div(v-else-if="!$store.getters['me/isAdmin']")
+    | You must be logged in as an admin to view this page.
+  div(v-else)
+    table.table.table-striped.table-condensed
+      tbody
+        tr
+          th Levels
+          th Course
+        tr(v-for="course in filteredCourses")
+          td {{courseLevels(course._id).length}}
+          td {{course.name}}
+        tr
+          td {{totalLevels}}
+          td All
+
+    div(v-for="course in filteredCourses")
+      strong {{course.name}}
+      .small {{course.description}}
+      .small Levels last updated {{courseCampaign(course._id).levelsUpdated}}
+      table.table.table-striped.table-condensed
+        tbody
+          tr
+            th {{courseLevels(course._id).length}}
+            th Slug
+            th Type
+            th Practice
+            th Practice Threshold (m)
+            th Shareable
+            th Primer
+            th New Concepts
+            
+          tr(v-for="level in courseLevels(course._id)")
+            td
+              a(:href="'/play/level/'+level.slug")
+               | {{levelNumberMapForCourse(course._id)[level.original]}}
+            td {{level.slug}}
+            td {{level.type}}
+            td {{level.practice}}
+            td {{level.practiceThresholdMinutes}}
+            td {{level.shareable}}
+            td {{level.primerLanguage}}
+            td
+              span(v-for="concept in levelConceptsBySlug[level.slug]")
+                | {{concept}}
+                =" "
